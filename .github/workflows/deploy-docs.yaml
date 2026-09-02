@@ -20,6 +20,9 @@ on:
       - "**/*.jpg"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   require-label:
     if: ${{ github.event_name == 'pull_request_target' }}
