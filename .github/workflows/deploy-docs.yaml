@@ -14,10 +14,10 @@ on:
       - labeled
     paths:
       - mkdocs.yaml
-      - "**/*.md"
-      - "**/*.svg"
-      - "**/*.png"
-      - "**/*.jpg"
+      - docs/**/*.md
+      - docs/**/*.svg
+      - docs/**/*.png
+      - docs/**/*.jpg
   workflow_dispatch:
 
 permissions:
