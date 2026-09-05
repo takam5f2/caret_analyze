@@ -180,12 +180,20 @@ class ArchitectureLoaded():
 
         # for executor
         executors = list(self._executors)
+        filtered_executors = []
         for executor in executors:
             cbg_values = [cbg for cbg in executor.callback_groups
                           if '/service_only_callback_group_'
                           not in cbg.callback_group_name]
-            # for cbg in exec.callback_groups:
+            # Skip executors that have no valid callback groups after filtering.
+            # This can happen when all callback groups are service-only
+            # (e.g. agnocast_bridge_node's service_only_callback_group).
+            if len(cbg_values) == 0:
+                continue
             executor._cbg_values = cbg_values
+            filtered_executors.append(executor)
+
+        self._executors = filtered_executors
 
 
 class CommValuesLoaded():
@@ -1814,6 +1822,13 @@ class ExecutorValuesLoaded():
                 # but currently does not significantly affect behavior.
                 # Therefore, the log level is temporarily lowered.
                 logger.log(INFO, e)
+
+        if len(callback_group_values) == 0:
+            msg = (
+                'No valid callback groups found for executor. '
+                f'executor_name: {executor_name}. skip loading.'
+            )
+            raise InvalidArgumentError(msg)
 
         return ExecutorStruct(
             executor.executor_type,

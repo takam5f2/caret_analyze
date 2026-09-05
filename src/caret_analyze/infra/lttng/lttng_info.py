@@ -633,6 +633,20 @@ class LttngInfo:
 
             nodes = self._formatted.nodes.clone()
             callback_groups = self._formatted.callback_groups.clone()
+
+            # Remove callback groups that have no actual callbacks.
+            # This can happen with Jazzy's single_threaded_executor which records
+            # an internal callback_group via callback_group_to_executor_entity_collector
+            # but never adds any callbacks to it via callback_group_add_* events.
+            # For this code path, we filter using the concat data which already
+            # contains only real callback_group_addr entries.
+            valid_cbg_addrs = set(concat.df['callback_group_addr'].values)
+            if len(valid_cbg_addrs) > 0:
+                cbg_df = callback_groups.df
+                callback_groups._df = cbg_df[
+                    cbg_df['callback_group_addr'].isin(valid_cbg_addrs)
+                ]
+
             merge(concat, nodes, 'node_handle')
             merge(concat, callback_groups, 'callback_group_addr', how='left')
 
@@ -719,6 +733,23 @@ class LttngInfo:
         """
         executor = self._formatted.executor.clone()
         callback_groups = self._formatted.callback_groups.clone()
+
+        # Remove callback groups that have no actual callbacks
+        # (same as in _get_callback_groups).
+        concat_target_dfs = []
+        concat_target_dfs.append(self._formatted.timer_callbacks.clone())
+        concat_target_dfs.append(self._formatted.subscription_callbacks.clone())
+        concat_target_dfs.append(self._formatted.service_callbacks.clone())
+        concat = TracePointData.concat(concat_target_dfs, [
+            'callback_group_addr'
+        ])
+        valid_cbg_addrs = set(concat.df['callback_group_addr'].values)
+        if len(valid_cbg_addrs) > 0:
+            cbg_df = callback_groups.df
+            callback_groups._df = cbg_df[
+                cbg_df['callback_group_addr'].isin(valid_cbg_addrs)
+            ]
+
         merge(executor, callback_groups, 'executor_addr')
         execs = []
 
@@ -727,6 +758,11 @@ class LttngInfo:
             executor_type_name = row['executor_type_name']
 
             cbg_ids = group['callback_group_id'].values
+            # Skip executors that have no actual callback groups.
+            # This can happen with Jazzy's single_threaded_executor
+            # which registers internal callback_groups that have no callbacks.
+            if len(cbg_ids) == 0:
+                continue
             execs.append(
                 ExecutorValue(
                     executor_type_name,
