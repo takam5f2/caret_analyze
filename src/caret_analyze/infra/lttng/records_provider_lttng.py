@@ -2600,11 +2600,11 @@ class FilteredRecordsSource:
             return RecordsFactory.create_instance(
                 None,
                 columns=[
-                    COLUMN_NAME.PUBLISHER_HANDLE,
-                    COLUMN_NAME.RCLCPP_PUBLISH_TIMESTAMP,
-                    COLUMN_NAME.MESSAGE_TIMESTAMP,
-                    COLUMN_NAME.SOURCE_TIMESTAMP,
-                    COLUMN_NAME.RMW_TAKE_TIMESTAMP,
+                    ColumnValue(COLUMN_NAME.PUBLISHER_HANDLE),
+                    ColumnValue(COLUMN_NAME.RCLCPP_PUBLISH_TIMESTAMP),
+                    ColumnValue(COLUMN_NAME.MESSAGE_TIMESTAMP),
+                    ColumnValue(COLUMN_NAME.SOURCE_TIMESTAMP),
+                    ColumnValue(COLUMN_NAME.RMW_TAKE_TIMESTAMP),
                 ]
             )
         rmw_records.drop_columns([
@@ -2678,11 +2678,11 @@ class FilteredRecordsSource:
             return RecordsFactory.create_instance(
                 None,
                 columns=[
-                    COLUMN_NAME.PUBLISHER_HANDLE,
-                    COLUMN_NAME.AGNOCAST_PUBLISH_TIMESTAMP,
-                    COLUMN_NAME.AGNOCAST_TAKE_EMPTY,
-                    COLUMN_NAME.AGNOCAST_ENTRY_ID,
-                    COLUMN_NAME.AGNOCAST_TAKE_TIMESTAMP,
+                    ColumnValue(COLUMN_NAME.PUBLISHER_HANDLE),
+                    ColumnValue(COLUMN_NAME.AGNOCAST_PUBLISH_TIMESTAMP),
+                    ColumnValue(COLUMN_NAME.AGNOCAST_TAKE_EMPTY),
+                    ColumnValue(COLUMN_NAME.AGNOCAST_ENTRY_ID),
+                    ColumnValue(COLUMN_NAME.AGNOCAST_TAKE_TIMESTAMP),
                 ]
             )
         take_records.drop_columns(['subscription_handle'])
